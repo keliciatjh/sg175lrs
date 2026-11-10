@@ -178,7 +178,7 @@
               <select id="judgePresetTemplate" onchange="loadPresetTemplate()" class="w-full bg-slate-900 border border-purple-800 rounded px-3 py-2 text-xs text-white font-semibold focus:outline-none focus:border-amber-400">
                 <option value="12p_standard">12P Standard (Seer, Witch, Guard, Hunter | 4 Wolves)</option>
                 <option value="12p_knight">12P Knight Duel (Seer, Witch, Knight, Hunter | 4 Wolves)</option>
-                <option value="12p_silencer">12P Silencer (Seer, Witch, Guard, Silencer | 4 Wolves)</option>
+                <option value="12p_blackmerchant">12P BM (Seer, Witch, Guard, BM | 4 Wolves)</option>
                 <option value="12p_idiot">12P Idiot Variant (Seer, Witch, Guard, Idiot | 4 Wolves)</option>
                 <option value="10p_express">10P Express (Seer, Witch, Guard | 3 Wolves)</option>
                 <option value="custom">Custom Composition</option>
@@ -233,7 +233,41 @@
             </div>
           </div>
         </div>
+          <!-- NEW: Special Werewolf Variant Selection Checkboxes -->
+          <div class="space-y-2 pt-2 border-t border-purple-900/40">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-rose-400">Choose Special Werewolf Variants to Include:</span>
+              <span class="text-[10px] text-gray-400">Replaces standard Werewolves up to Werewolf Count</span>
+            </div>
 
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-rose-900/60 cursor-pointer hover:border-rose-500">
+                <input type="checkbox" class="judge-wolf-checkbox accent-rose-500" value="Wolf King" onchange="updateCustomRosterCounts()">
+                <span class="text-rose-400 font-bold">👑 Wolf King</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-rose-900/60 cursor-pointer hover:border-rose-500">
+                <input type="checkbox" class="judge-wolf-checkbox accent-rose-500" value="Wolf Beauty" onchange="updateCustomRosterCounts()">
+                <span class="text-pink-400 font-bold">💋 Wolf Beauty</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-rose-900/60 cursor-pointer hover:border-rose-500">
+                <input type="checkbox" class="judge-wolf-checkbox accent-rose-500" value="White Wolf King" onchange="updateCustomRosterCounts()">
+                <span class="text-slate-200 font-bold">🐺 White Wolf King</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-rose-900/60 cursor-pointer hover:border-rose-500">
+                <input type="checkbox" class="judge-wolf-checkbox accent-rose-500" value="Gargoyle" onchange="updateCustomRosterCounts()">
+                <span class="text-purple-400 font-bold">🗿 Gargoyle</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-rose-900/60 cursor-pointer hover:border-rose-500">
+                <input type="checkbox" class="judge-wolf-checkbox accent-rose-500" value="Hidden Wolf" onchange="updateCustomRosterCounts()">
+                <span class="text-gray-400 font-bold">🕵️ Hidden Wolf</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-rose-900/60 cursor-pointer hover:border-rose-500">
+                <input type="checkbox" class="judge-wolf-checkbox accent-rose-500" value="Wolf Brother" onchange="updateCustomRosterCounts()">
+                <span class="text-amber-400 font-bold">🐺 Wolf Brother</span>
+              </label>
+            </div>
+          </div>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-4 bg-slate-950 p-5 rounded-xl border border-purple-900">
             <h3 class="font-orbitron text-sm font-bold text-purple-300">Night Action Resolver</h3>
@@ -534,10 +568,34 @@
       let colorClass = 'text-white';
       let descriptionText = 'You are part of the village faction.';
 
-      if (role === 'Werewolf') {
+        if (role === 'Werewolf') {
         emoji = '🐺';
         colorClass = 'text-rose-400';
         descriptionText = 'Eliminate a villager during the night phase with your pack.';
+      } else if (role === 'Wolf King') {
+        emoji = '👑';
+        colorClass = 'text-rose-400';
+        descriptionText = 'Lead the wolf pack. If eliminated (except by poison), shoot a player as revenge.';
+      } else if (role === 'Wolf Beauty') {
+        emoji = '💋';
+        colorClass = 'text-pink-400';
+        descriptionText = 'Seduce one player each night; if you die, your target dies with you.';
+      } else if (role === 'White Wolf King') {
+        emoji = '🐺';
+        colorClass = 'text-slate-200';
+        descriptionText = 'Self-detonate during day discussions to instantly eliminate a player of your choice.';
+      } else if (role === 'Gargoyle') {
+        emoji = '🗿';
+        colorClass = 'text-purple-400';
+        descriptionText = 'Wake independently to check player roles. Join wolf pack after all wolves die.';
+      } else if (role === 'Hidden Wolf') {
+        emoji = '🕵️';
+        colorClass = 'text-gray-400';
+        descriptionText = 'Appears as Good to the Seer. Cannot participate in wolf kills until teammates die.';
+      } else if (role === 'Wolf Brother') {
+        emoji = '🐺';
+        colorClass = 'text-amber-400';
+        descriptionText = 'If your sibling dies, gain double kill power for the wolf pack.';
       } else if (role === 'Seer') {
         emoji = '🔮';
         colorClass = 'text-cyan-400';
@@ -565,7 +623,7 @@
       } else if (role === 'BlackMerchant') {
         emoji = '🔕';
         colorClass = 'text-indigo-300';
-        descriptionText = 'Silence one player nightly from speaking in the following day phase.';
+        descriptionText = 'Give out gifts to anyone, if given to wolf brother you will die.';
       }
 
       box.className = `my-auto py-8 px-4 bg-slate-900 border-2 border-purple-500 rounded-xl space-y-3 shadow-xl transition-all`;
