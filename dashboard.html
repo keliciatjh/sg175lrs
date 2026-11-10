@@ -66,8 +66,8 @@
         </div>
         <div class="flex flex-wrap items-center gap-3">
           <select id="gamePreset" class="bg-slate-950 border border-purple-800 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-400 font-semibold">
-            <option value="12p_standard">12P Standard (4 Wolves, 4 Gods, 4 Villagers)</option>
-            <option value="10p_express">10P Express (3 Wolves, 3 Gods, 4 Villagers)</option>
+            <option value="12p_standard">12P Mode (4 Wolves, 4 Gods, 4 Villagers)</option>
+            <option value="10p_express">10P Mode (3 Wolves, 3 Gods, 4 Villagers)</option>
           </select>
           <button onclick="dealCards()" class="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-5 py-2 rounded-lg font-orbitron text-sm font-bold transition shadow-lg">
             🎴 Deal & Assign Roles
@@ -154,9 +154,49 @@
         <div class="flex justify-between items-center border-b border-purple-900/50 pb-4">
           <div>
             <h2 class="font-orbitron text-xl font-bold text-amber-400">👑 Official Moderator Console</h2>
-            <p class="text-xs text-gray-400">Restricted judge tooling for live match management and night phase calculations.</p>
+            <p class="text-xs text-gray-400">Custom God roster configuration and night action resolver.</p>
           </div>
           <span class="text-xs px-3 py-1 rounded bg-amber-950 text-amber-300 border border-amber-700 font-mono">MODERATOR ACCESS</span>
+        </div>
+
+        <!-- NEW: GOD ROLE SELECTION FOR MODERATORS -->
+        <div class="bg-slate-950 p-5 rounded-xl border border-amber-500/30 space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-orbitron text-sm font-bold text-amber-400">🏛️ Select God Roles for Current Game Preset</h3>
+            <span id="godCountBadge" class="text-xs bg-amber-950 text-amber-300 px-2.5 py-0.5 rounded border border-amber-800 font-bold">4 / 4 Gods Selected</span>
+          </div>
+          <p class="text-xs text-gray-400">Check the God roles you want to feature in this match. Remaining slots will automatically be filled by Villagers.</p>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+              <input type="checkbox" class="god-checkbox accent-amber-500" value="Seer" checked onchange="updateGodSelection()">
+              <span class="text-cyan-300 font-bold">🔮 Seer</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+              <input type="checkbox" class="god-checkbox accent-amber-500" value="Witch" checked onchange="updateGodSelection()">
+              <span class="text-purple-300 font-bold">🧪 Witch</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+              <input type="checkbox" class="god-checkbox accent-amber-500" value="Guard" checked onchange="updateGodSelection()">
+              <span class="text-amber-300 font-bold">🛡️ Guard</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+              <input type="checkbox" class="god-checkbox accent-amber-500" value="Hunter" checked onchange="updateGodSelection()">
+              <span class="text-emerald-300 font-bold">🎯 Hunter</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+              <input type="checkbox" class="god-checkbox accent-amber-500" value="Idiot" onchange="updateGodSelection()">
+              <span class="text-rose-300 font-bold">🤡 Idiot</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+              <input type="checkbox" class="god-checkbox accent-amber-500" value="Knight" onchange="updateGodSelection()">
+              <span class="text-sky-300 font-bold">⚔️ Knight</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+              <input type="checkbox" class="god-checkbox accent-amber-500" value="BlackMerchant" onchange="updateGodSelection()">
+              <span class="text-indigo-300 font-bold">🔕 BlackMerchant</span>
+            </label>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,10 +248,10 @@
 
   <!-- Script Logic -->
   <script>
-    // 1. LIST OF AUTHORIZED MODERATOR USERNAMES
+    // 1. AUTHORIZED MODERATORS
     const MODERATOR_LIST = ["admin", "kelicia", "sglrs_mod"];
 
-    // 2. Session Security Check
+    // 2. Security Session Check
     const activeUser = sessionStorage.getItem('sglrs_active_user');
     if (!activeUser) {
       alert("Access denied. Please log in first.");
@@ -236,17 +276,29 @@
       window.location.href = "index.html";
     }
 
-    // Role Presets
-    const presets = {
-      '12p_standard': ['Werewolf', 'Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Hunter', 'Villager', 'Villager', 'Villager', 'Villager'],
-      '10p_express': ['Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Villager', 'Villager', 'Villager', 'Villager']
-    };
+    // Active Custom Gods List
+    let activeGods = ['Seer', 'Witch', 'Guard', 'Hunter'];
+
+    function updateGodSelection() {
+      const checkboxes = document.querySelectorAll('.god-checkbox:checked');
+      activeGods = Array.from(checkboxes).map(cb => cb.value);
+      
+      const presetKey = document.getElementById('gamePreset').value;
+      const targetGodCount = presetKey === '12p_standard' ? 4 : 3;
+      
+      document.getElementById('godCountBadge').textContent = `${activeGods.length} / ${targetGodCount} Gods Selected`;
+      if (activeGods.length !== targetGodCount) {
+        document.getElementById('godCountBadge').className = 'text-xs bg-rose-950 text-rose-300 px-2.5 py-0.5 rounded border border-rose-800 font-bold';
+      } else {
+        document.getElementById('godCountBadge').className = 'text-xs bg-amber-950 text-amber-300 px-2.5 py-0.5 rounded border border-amber-800 font-bold';
+      }
+    }
 
     let selectedSeat = null;
     let assignedRoles = {};
     let currentDrawnRole = null;
 
-    // LocalStorage Statistics Logic
+    // Statistics Engine
     function getUserStats() {
       const allStats = JSON.parse(localStorage.getItem('sglrs_user_stats') || '{}');
       if (!allStats[activeUser]) {
@@ -301,10 +353,10 @@
       }
     }
 
-    // Seat & Dealing Logic
+    // Seat & Dealing Engine with Dynamic God Support
     function initSeats() {
       const presetKey = document.getElementById('gamePreset').value;
-      const totalSeats = presets[presetKey].length;
+      const totalSeats = presetKey === '12p_standard' ? 12 : 10;
       const container = document.getElementById('seatContainer');
       container.innerHTML = '';
 
@@ -335,8 +387,21 @@
       }
 
       const presetKey = document.getElementById('gamePreset').value;
-      let roles = [...presets[presetKey]];
+      const is12P = presetKey === '12p_standard';
+      const wolfCount = is12P ? 4 : 3;
+      const targetTotal = is12P ? 12 : 10;
 
+      // Build custom deck
+      let roles = [];
+      for (let i = 0; i < wolfCount; i++) roles.push('Werewolf');
+      roles = roles.concat(activeGods);
+
+      // Fill remainder with Villagers
+      while (roles.length < targetTotal) {
+        roles.push('Villager');
+      }
+
+      // Shuffle deck
       for (let i = roles.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [roles[i], roles[j]] = [roles[j], roles[i]];
@@ -390,6 +455,18 @@
         emoji = '🎯';
         colorClass = 'text-emerald-400';
         descriptionText = 'Shoot a target upon elimination.';
+      } else if (role === 'Idiot') {
+        emoji = '🤡';
+        colorClass = 'text-rose-300';
+        descriptionText = 'Reveal identity upon being voted out to stay alive without vote rights.';
+      } else if (role === 'Knight') {
+        emoji = '⚔️';
+        colorClass = 'text-sky-300';
+        descriptionText = 'Challenge a player during day discussion to duel alignment.';
+      } else if (role === 'BlackMerchant') {
+        emoji = '🔕';
+        colorClass = 'text-indigo-300';
+        descriptionText = 'Silence one player nightly from speaking in the following day phase.';
       }
 
       box.className = `my-auto py-8 px-4 bg-slate-900 border-2 border-purple-500 rounded-xl space-y-3 shadow-xl transition-all`;
@@ -472,11 +549,13 @@
     window.onload = () => {
       initSeats();
       renderStats();
+      updateGodSelection();
       document.getElementById('gamePreset').addEventListener('change', () => {
         selectedSeat = null;
         document.getElementById('selectedSeatBadge').textContent = 'No Seat Selected';
         document.getElementById('matchOutcomeBox').classList.add('hidden');
         initSeats();
+        updateGodSelection();
       });
     };
   </script>
