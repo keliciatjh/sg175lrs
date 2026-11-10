@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SG175LRS - Player & Moderator Dashboard</title>
+  <title>SGLRS - Player & Moderator Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -209,7 +209,7 @@
   <!-- Script Logic -->
   <script>
     // 1. LIST OF AUTHORIZED MODERATOR USERNAMES
-    const MODERATOR_LIST = ["kelicia", "kaiyang", "sglrs_mod"];
+    const MODERATOR_LIST = ["admin", "kelicia", "sglrs_mod"];
 
     // 2. Session Security Check
     const activeUser = sessionStorage.getItem('sglrs_active_user');
@@ -238,9 +238,7 @@
 
     // Role Presets
     const presets = {
-      '12p_YNSL': ['Werewolf', 'Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Hunter', 'Villager', 'Villager', 'Villager', 'Villager'],
-      '12p_YNSB': ['Werewolf', 'Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Idiot', 'Guard', 'Villager', 'Villager', 'Villager', 'Villager'],
-      '12p_BM': ['Werewolf', 'Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'BlackMerchant', 'Guard', 'Villager', 'Villager', 'Villager', 'Villager'],
+      '12p_standard': ['Werewolf', 'Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Hunter', 'Villager', 'Villager', 'Villager', 'Villager'],
       '10p_express': ['Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Villager', 'Villager', 'Villager', 'Villager']
     };
 
