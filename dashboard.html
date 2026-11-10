@@ -529,9 +529,22 @@
 
       const config = getActiveMatchConfig();
 
-      // Build active role deck based on moderator configuration
+     // Build active role deck based on moderator configuration
       let roles = [];
-      for (let i = 0; i < config.wolves; i++) roles.push('Werewolf');
+      const specialWolves = config.specialWolves || [];
+      
+      // Add special wolves first up to the configured wolf count (replacing standard wolves)
+      specialWolves.forEach(wolfRole => {
+        if (roles.length < config.wolves) {
+          roles.push(wolfRole);
+        }
+      });
+      
+      // Fill remaining wolf slots with standard Werewolf so total wolf count equals config.wolves
+      while (roles.length < config.wolves) {
+        roles.push('Werewolf');
+      }
+
       roles = roles.concat(config.gods);
       for (let i = 0; i < config.villagers; i++) roles.push('Villager');
 
