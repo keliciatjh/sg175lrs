@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SGLRS - Player & Moderator Dashboard</title>
+  <title>SG175LRS - Player & Moderator Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -62,13 +62,13 @@
       <div class="bg-sglrs-panel p-6 rounded-xl neon-border flex flex-wrap justify-between items-center gap-4">
         <div>
           <h2 class="font-orbitron text-lg font-bold text-cyan-400">Match Card Distribution</h2>
-          <p class="text-xs text-gray-400">Choose your game preset, pick your seat number, and draw your secret role card.</p>
+          <p class="text-xs text-gray-400">Pick your seat number and draw your secret role card for the active game preset.</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-          <select id="gamePreset" class="bg-slate-950 border border-purple-800 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-400 font-semibold">
-            <option value="12p_standard">12P Mode (4 Wolves, 4 Gods, 4 Villagers)</option>
-            <option value="10p_express">10P Mode (3 Wolves, 3 Gods, 4 Villagers)</option>
-          </select>
+          <div class="text-xs px-3 py-2 bg-slate-950 border border-purple-800 rounded-lg text-purple-300 font-semibold flex items-center gap-2">
+            <span>📡 Active Preset:</span>
+            <strong id="activePresetBadge" class="text-cyan-400 font-orbitron">12P Standard</strong>
+          </div>
           <button onclick="dealCards()" class="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-5 py-2 rounded-lg font-orbitron text-sm font-bold transition shadow-lg">
             🎴 Deal & Assign Roles
           </button>
@@ -154,48 +154,83 @@
         <div class="flex justify-between items-center border-b border-purple-900/50 pb-4">
           <div>
             <h2 class="font-orbitron text-xl font-bold text-amber-400">👑 Official Moderator Console</h2>
-            <p class="text-xs text-gray-400">Custom God roster configuration and night action resolver.</p>
+            <p class="text-xs text-gray-400">Configure game setups, broadcast active role presets to all players, and resolve night actions.</p>
           </div>
           <span class="text-xs px-3 py-1 rounded bg-amber-950 text-amber-300 border border-amber-700 font-mono">MODERATOR ACCESS</span>
         </div>
 
-        <!-- NEW: GOD ROLE SELECTION FOR MODERATORS -->
-        <div class="bg-slate-950 p-5 rounded-xl border border-amber-500/30 space-y-4">
-          <div class="flex justify-between items-center">
-            <h3 class="font-orbitron text-sm font-bold text-amber-400">🏛️ Select God Roles for Current Game Preset</h3>
-            <span id="godCountBadge" class="text-xs bg-amber-950 text-amber-300 px-2.5 py-0.5 rounded border border-amber-800 font-bold">4 / 4 Gods Selected</span>
+        <!-- MODERATOR PRESET CREATION & BROADCASTER PANEL -->
+        <div class="bg-slate-950 p-5 rounded-xl border border-amber-500/30 space-y-5">
+          <div class="flex flex-wrap justify-between items-center gap-2">
+            <div>
+              <h3 class="font-orbitron text-sm font-bold text-amber-400">🎮 Match Preset Setup & God Roster Selector</h3>
+              <p class="text-[11px] text-gray-400">Select template presets or check individual God roles to include in the active game setup.</p>
+            </div>
+            <button onclick="broadcastActivePreset()" class="bg-gradient-to-r from-amber-600 to-cyan-600 hover:from-amber-500 hover:to-cyan-500 text-slate-950 px-4 py-2 rounded-lg font-orbitron text-xs font-bold transition shadow-lg">
+              📡 Broadcast & Set Active Game Preset
+            </button>
           </div>
-          <p class="text-xs text-gray-400">Check the God roles you want to feature in this match. Remaining slots will automatically be filled by Villagers.</p>
-          
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
-              <input type="checkbox" class="god-checkbox accent-amber-500" value="Seer" checked onchange="updateGodSelection()">
-              <span class="text-cyan-300 font-bold">🔮 Seer</span>
-            </label>
-            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
-              <input type="checkbox" class="god-checkbox accent-amber-500" value="Witch" checked onchange="updateGodSelection()">
-              <span class="text-purple-300 font-bold">🧪 Witch</span>
-            </label>
-            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
-              <input type="checkbox" class="god-checkbox accent-amber-500" value="Guard" checked onchange="updateGodSelection()">
-              <span class="text-amber-300 font-bold">🛡️ Guard</span>
-            </label>
-            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
-              <input type="checkbox" class="god-checkbox accent-amber-500" value="Hunter" checked onchange="updateGodSelection()">
-              <span class="text-emerald-300 font-bold">🎯 Hunter</span>
-            </label>
-            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
-              <input type="checkbox" class="god-checkbox accent-amber-500" value="Idiot" onchange="updateGodSelection()">
-              <span class="text-rose-300 font-bold">🤡 Idiot</span>
-            </label>
-            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
-              <input type="checkbox" class="god-checkbox accent-amber-500" value="Knight" onchange="updateGodSelection()">
-              <span class="text-sky-300 font-bold">⚔️ Knight</span>
-            </label>
-            <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
-              <input type="checkbox" class="god-checkbox accent-amber-500" value="BlackMerchant" onchange="updateGodSelection()">
-              <span class="text-indigo-300 font-bold">🔕 BlackMerchant</span>
-            </label>
+
+          <!-- Template Preset Selector Dropdown -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs font-semibold text-purple-300 block mb-1">Quick Preset Template:</label>
+              <select id="judgePresetTemplate" onchange="loadPresetTemplate()" class="w-full bg-slate-900 border border-purple-800 rounded px-3 py-2 text-xs text-white font-semibold focus:outline-none focus:border-amber-400">
+                <option value="12p_standard">12P Standard (Seer, Witch, Guard, Hunter | 4 Wolves)</option>
+                <option value="12p_knight">12P Knight Duel (Seer, Witch, Knight, Hunter | 4 Wolves)</option>
+                <option value="12p_silencer">12P Silencer (Seer, Witch, Guard, Silencer | 4 Wolves)</option>
+                <option value="12p_idiot">12P Idiot Variant (Seer, Witch, Guard, Idiot | 4 Wolves)</option>
+                <option value="10p_express">10P Express (Seer, Witch, Guard | 3 Wolves)</option>
+                <option value="custom">Custom Composition</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-purple-300 block mb-1">Werewolf Count:</label>
+              <input type="number" id="judgeWolfCount" min="1" max="6" value="4" onchange="updateCustomRosterCounts()" class="w-full bg-slate-900 border border-purple-800 rounded px-3 py-1.5 text-xs text-white">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-purple-300 block mb-1">Villager Count:</label>
+              <input type="number" id="judgeVillagerCount" min="0" max="8" value="4" onchange="updateCustomRosterCounts()" class="w-full bg-slate-900 border border-purple-800 rounded px-3 py-1.5 text-xs text-white">
+            </div>
+          </div>
+
+          <!-- Interactive God Role Selection Checkboxes -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-gray-300">Choose God Roles to Include:</span>
+              <span id="judgeTotalPlayerBadge" class="text-xs bg-purple-950 text-cyan-400 px-2.5 py-0.5 rounded border border-purple-800 font-bold">Total Players: 12</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+                <input type="checkbox" class="judge-god-checkbox accent-amber-500" value="Seer" checked onchange="updateCustomRosterCounts()">
+                <span class="text-cyan-300 font-bold">🔮 Seer</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+                <input type="checkbox" class="judge-god-checkbox accent-amber-500" value="Witch" checked onchange="updateCustomRosterCounts()">
+                <span class="text-purple-300 font-bold">🧪 Witch</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+                <input type="checkbox" class="judge-god-checkbox accent-amber-500" value="Guard" checked onchange="updateCustomRosterCounts()">
+                <span class="text-amber-300 font-bold">🛡️ Guard</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+                <input type="checkbox" class="judge-god-checkbox accent-amber-500" value="Hunter" checked onchange="updateCustomRosterCounts()">
+                <span class="text-emerald-300 font-bold">🎯 Hunter</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+                <input type="checkbox" class="judge-god-checkbox accent-amber-500" value="Idiot" onchange="updateCustomRosterCounts()">
+                <span class="text-rose-300 font-bold">🤡 Idiot</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+                <input type="checkbox" class="judge-god-checkbox accent-amber-500" value="Knight" onchange="updateCustomRosterCounts()">
+                <span class="text-sky-300 font-bold">⚔️ Knight</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-2.5 rounded border border-purple-900 cursor-pointer hover:border-amber-500">
+                <input type="checkbox" class="judge-god-checkbox accent-amber-500" value="Silencer" onchange="updateCustomRosterCounts()">
+                <span class="text-indigo-300 font-bold">🔕 BlackMerchant</span>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -243,55 +278,126 @@
 
   <!-- Footer -->
   <footer class="bg-sglrs-panel border-t border-purple-900/50 py-4 text-center text-xs text-gray-500">
-    <p>© 2026 SGLRS Hub • Singapore Langrensha Association</p>
+    <p>© 2026 SGLRS Hub • 175 Langrensha Game</p>
   </footer>
 
   <!-- Script Logic -->
   <script>
-    // 1. AUTHORIZED MODERATORS
+    // 1. AUTHORIZED MODERATORS & EARLY INITIALIZATION
     const MODERATOR_LIST = ["admin", "kelicia", "sglrs_mod"];
 
-    // 2. Security Session Check
+    // Safely perform page redirects to prevent invalid URL assignment errors
+    function safeRedirect(targetUrl) {
+      if (targetUrl && typeof targetUrl === 'string' && targetUrl.trim() !== '') {
+        window.location.href = targetUrl;
+      } else {
+        window.location.href = "index.html";
+      }
+    }
+
+    // 2. Security Session Check (initialized immediately so switchTab and all handlers can access)
     const activeUser = sessionStorage.getItem('sglrs_active_user');
     if (!activeUser) {
       alert("Access denied. Please log in first.");
-      window.location.href = "index.html";
+      safeRedirect("index.html");
     }
 
-    const isModerator = MODERATOR_LIST.includes(activeUser.toLowerCase());
-
-    // Update Header UI
-    document.getElementById('activeUserDisplay').textContent = activeUser;
-    document.getElementById('statsUsernameDisplay').textContent = activeUser;
-
-    if (isModerator) {
-      document.getElementById('tab-judge').classList.remove('hidden');
-      const badge = document.getElementById('userBadge');
-      badge.textContent = '👑 Moderator';
-      badge.className = 'ml-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-700 font-bold';
-    }
+    const isModerator = MODERATOR_LIST.includes(activeUser ? activeUser.toLowerCase() : "");
 
     function handleLogout() {
       sessionStorage.removeItem('sglrs_active_user');
-      window.location.href = "index.html";
+      safeRedirect("index.html");
     }
 
-    // Active Custom Gods List
-    let activeGods = ['Seer', 'Witch', 'Guard', 'Hunter'];
+    // Default Match Configuration
+    const defaultPreset = {
+      name: "12P Standard",
+      wolves: 4,
+      gods: ['Seer', 'Witch', 'Guard', 'Hunter'],
+      villagers: 4
+    };
 
-    function updateGodSelection() {
-      const checkboxes = document.querySelectorAll('.god-checkbox:checked');
-      activeGods = Array.from(checkboxes).map(cb => cb.value);
-      
-      const presetKey = document.getElementById('gamePreset').value;
-      const targetGodCount = presetKey === '12p_standard' ? 4 : 3;
-      
-      document.getElementById('godCountBadge').textContent = `${activeGods.length} / ${targetGodCount} Gods Selected`;
-      if (activeGods.length !== targetGodCount) {
-        document.getElementById('godCountBadge').className = 'text-xs bg-rose-950 text-rose-300 px-2.5 py-0.5 rounded border border-rose-800 font-bold';
-      } else {
-        document.getElementById('godCountBadge').className = 'text-xs bg-amber-950 text-amber-300 px-2.5 py-0.5 rounded border border-amber-800 font-bold';
+    function getActiveMatchConfig() {
+      const stored = localStorage.getItem('sglrs_active_match_config');
+      if (!stored) {
+        localStorage.setItem('sglrs_active_match_config', JSON.stringify(defaultPreset));
+        return defaultPreset;
       }
+      return JSON.parse(stored);
+    }
+
+    function broadcastActivePreset() {
+      if (!isModerator) return;
+      const wolves = parseInt(document.getElementById('judgeWolfCount').value) || 3;
+      const villagers = parseInt(document.getElementById('judgeVillagerCount').value) || 0;
+      const checkboxes = document.querySelectorAll('.judge-god-checkbox:checked');
+      const selectedGods = Array.from(checkboxes).map(cb => cb.value);
+
+      const templateName = document.getElementById('judgePresetTemplate').options[document.getElementById('judgePresetTemplate').selectedIndex].text.split(' (')[0];
+
+      const newConfig = {
+        name: templateName,
+        wolves: wolves,
+        gods: selectedGods,
+        villagers: villagers
+      };
+
+      localStorage.setItem('sglrs_active_match_config', JSON.stringify(newConfig));
+      alert(`Preset Broadcasted! Active match set to: ${newConfig.name}`);
+      refreshActivePresetUI();
+    }
+
+    function loadPresetTemplate() {
+      const val = document.getElementById('judgePresetTemplate').value;
+      const checkboxes = document.querySelectorAll('.judge-god-checkbox');
+
+      let targetGods = [];
+      let wolves = 4;
+      let villagers = 4;
+
+      if (val === '12p_standard') {
+        targetGods = ['Seer', 'Witch', 'Guard', 'Hunter'];
+        wolves = 4; villagers = 4;
+      } else if (val === '12p_knight') {
+        targetGods = ['Seer', 'Witch', 'Knight', 'Hunter'];
+        wolves = 4; villagers = 4;
+      } else if (val === '12p_Blackmerchant') {
+        targetGods = ['Seer', 'Witch', 'Guard', 'BM'];
+        wolves = 4; villagers = 4;
+      } else if (val === '12p_idiot') {
+        targetGods = ['Seer', 'Witch', 'Guard', 'Idiot'];
+        wolves = 4; villagers = 4;
+      } else if (val === '10p_express') {
+        targetGods = ['Seer', 'Witch', 'Guard'];
+        wolves = 3; villagers = 4;
+      }
+
+      if (val !== 'custom') {
+        document.getElementById('judgeWolfCount').value = wolves;
+        document.getElementById('judgeVillagerCount').value = villagers;
+        checkboxes.forEach(cb => {
+          cb.checked = targetGods.includes(cb.value);
+        });
+      }
+      updateCustomRosterCounts();
+    }
+
+    function updateCustomRosterCounts() {
+      const wolves = parseInt(document.getElementById('judgeWolfCount').value) || 0;
+      const villagers = parseInt(document.getElementById('judgeVillagerCount').value) || 0;
+      const checkedGods = document.querySelectorAll('.judge-god-checkbox:checked').length;
+      const total = wolves + villagers + checkedGods;
+
+      document.getElementById('judgeTotalPlayerBadge').textContent = `Total Players: ${total}`;
+    }
+
+    function refreshActivePresetUI() {
+      const config = getActiveMatchConfig();
+      document.getElementById('activePresetBadge').textContent = config.name;
+      selectedSeat = null;
+      document.getElementById('selectedSeatBadge').textContent = 'No Seat Selected';
+      document.getElementById('matchOutcomeBox').classList.add('hidden');
+      initSeats();
     }
 
     let selectedSeat = null;
@@ -353,10 +459,10 @@
       }
     }
 
-    // Seat & Dealing Engine with Dynamic God Support
+    // Seat & Dealing Engine with Active Match Broadcast Support
     function initSeats() {
-      const presetKey = document.getElementById('gamePreset').value;
-      const totalSeats = presetKey === '12p_standard' ? 12 : 10;
+      const config = getActiveMatchConfig();
+      const totalSeats = config.wolves + config.gods.length + config.villagers;
       const container = document.getElementById('seatContainer');
       container.innerHTML = '';
 
@@ -386,20 +492,13 @@
         return;
       }
 
-      const presetKey = document.getElementById('gamePreset').value;
-      const is12P = presetKey === '12p_standard';
-      const wolfCount = is12P ? 4 : 3;
-      const targetTotal = is12P ? 12 : 10;
+      const config = getActiveMatchConfig();
 
-      // Build custom deck
+      // Build active role deck based on moderator configuration
       let roles = [];
-      for (let i = 0; i < wolfCount; i++) roles.push('Werewolf');
-      roles = roles.concat(activeGods);
-
-      // Fill remainder with Villagers
-      while (roles.length < targetTotal) {
-        roles.push('Villager');
-      }
+      for (let i = 0; i < config.wolves; i++) roles.push('Werewolf');
+      roles = roles.concat(config.gods);
+      for (let i = 0; i < config.villagers; i++) roles.push('Villager');
 
       // Shuffle deck
       for (let i = roles.length - 1; i > 0; i--) {
@@ -547,16 +646,11 @@
 
     // Initialize
     window.onload = () => {
-      initSeats();
+      refreshActivePresetUI();
       renderStats();
-      updateGodSelection();
-      document.getElementById('gamePreset').addEventListener('change', () => {
-        selectedSeat = null;
-        document.getElementById('selectedSeatBadge').textContent = 'No Seat Selected';
-        document.getElementById('matchOutcomeBox').classList.add('hidden');
-        initSeats();
-        updateGodSelection();
-      });
+      if (isModerator) {
+        loadPresetTemplate();
+      }
     };
   </script>
 
