@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SGLRS - Singapore Langrensha Hub & Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            rajdhani: ['Rajdhani', 'sans-serif']
+          },
+          colors: {
+            sglrs: {
+              bg: '#0a0915',
+              panel: '#131127',
+              accent: '#8b5cf6',
+              cyan: '#06b6d4',
+              rose: '#f43f5e',
+              amber: '#f59e0b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0a0915; color: #f3f4f6; font-family: 'Rajdhani', sans-serif; }
+    .neon-border { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); border: 1px solid rgba(139, 92, 246, 0.4); }
+    .neon-text { text-shadow: 0 0 10px rgba(6, 182, 212, 0.6); }
+    .wolf-glow { box-shadow: 0 0 20px rgba(244, 63, 94, 0.4); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- Header / Navigation -->
+  <header class="bg-sglrs-panel border-b border-purple-900/50 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-purple-600 to-cyan-400 flex items-center justify-center font-orbitron font-extrabold text-xl text-white wolf-glow">
+          🐺
+        </div>
+        <div>
+          <h1 class="font-orbitron font-bold text-xl text-white tracking-wider neon-text">SGLRS HUB</h1>
+          <p class="text-xs text-purple-400 font-semibold">Singapore Langrensha Association</p>
+        </div>
+      </div>
+      <nav class="flex space-x-2 mt-4 sm:mt-0">
+        <button onclick="switchTab('moderator')" id="tab-moderator" class="px-4 py-2 rounded-lg font-orbitron text-sm font-semibold transition bg-purple-600 text-white shadow-lg">Judge Room</button>
+        <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="px-4 py-2 rounded-lg font-orbitron text-sm font-semibold text-gray-400 hover:text-white transition">Leaderboard</button>
+        <button onclick="switchTab('compendium')" id="tab-compendium" class="px-4 py-2 rounded-lg font-orbitron text-sm font-semibold text-gray-400 hover:text-white transition">Roles & Rules</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+
+    <!-- TAB 1: JUDGE / MODERATOR ASSISTANT -->
+    <section id="view-moderator" class="space-y-6">
+      
+      <!-- Top Control Toolbar -->
+      <div class="bg-sglrs-panel p-6 rounded-xl neon-border flex flex-wrap justify-between items-center gap-4">
+        <div>
+          <h2 class="font-orbitron text-lg font-bold text-cyan-400">Match Assistant & Moderator Console</h2>
+          <p class="text-xs text-gray-400">Setup preset, shuffle roles, and automate night phase interactions.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <select id="presetSelect" onchange="applyPreset()" class="bg-purple-950/80 border border-purple-600/50 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-400">
+            <option value="12p_standard">12P Standard (4 Wolf, 4 God, 4 Villager)</option>
+            <option value="12p_wolfking">12P Wolf King & Guard</option>
+            <option value="10p_express">10P Express Setup</option>
+          </select>
+          <button onclick="shuffleRoles()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg font-orbitron text-sm font-semibold transition shadow-md">
+            🔀 Deal Roles
+          </button>
+          <button onclick="resetGame()" class="bg-rose-700 hover:bg-rose-600 text-white px-4 py-2 rounded-lg font-orbitron text-sm font-semibold transition">
+            🔄 Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Game Status Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Players Grid (12 Players) -->
+        <div class="md:col-span-2 bg-sglrs-panel p-6 rounded-xl neon-border">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-orbitron text-md font-bold text-purple-300">Player Roster (12 Players)</h3>
+            <span id="aliveCount" class="text-xs bg-purple-900/60 text-purple-300 px-3 py-1 rounded-full font-semibold">Alive: 12 / 12</span>
+          </div>
+
+          <div id="playerRoster" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <!-- Player Cards dynamically generated by JS -->
+          </div>
+        </div>
+
+        <!-- Night Resolution Panel & Soundboard -->
+        <div class="space-y-6">
+          <div class="bg-sglrs-panel p-6 rounded-xl neon-border space-y-4">
+            <h3 class="font-orbitron text-md font-bold text-rose-400">Night Phase Resolution</h3>
+            <p class="text-xs text-gray-400">Record night actions to calculate fatalities with official rule logic.</p>
+            
+            <div class="space-y-3 text-sm">
+              <div>
+                <label class="text-xs text-gray-400 block mb-1">Guard Protect Target:</label>
+                <select id="guardTarget" class="w-full bg-slate-900 border border-purple-800 rounded px-2 py-1 text-white"></select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-400 block mb-1">Werewolf Kill Target:</label>
+                <select id="wolfTarget" class="w-full bg-slate-900 border border-purple-800 rounded px-2 py-1 text-white"></select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-400 block mb-1">Witch Action:</label>
+                <select id="witchAction" class="w-full bg-slate-900 border border-purple-800 rounded px-2 py-1 text-white">
+                  <option value="none">No Action</option>
+                  <option value="heal">Use Healing Potion</option>
+                  <option value="poison">Use Poison Potion</option>
+                </select>
+              </div>
+              <div id="witchPoisonTargetContainer" class="hidden">
+                <label class="text-xs text-rose-400 block mb-1">Witch Poison Target:</label>
+                <select id="witchPoisonTarget" class="w-full bg-slate-900 border border-rose-900 rounded px-2 py-1 text-white"></select>
+              </div>
+            </div>
+
+            <button onclick="resolveNight()" class="w-full bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-orbitron py-2 rounded-lg font-bold text-sm transition shadow-lg mt-2">
+              🌙 Resolve Night Deaths
+            </button>
+
+            <div id="nightResult" class="hidden p-3 bg-slate-900/80 border border-purple-500/40 rounded-lg text-xs space-y-1 text-gray-200">
+            </div>
+          </div>
+
+          <!-- Sound Cues Synth -->
+          <div class="bg-sglrs-panel p-6 rounded-xl neon-border space-y-3">
+            <h3 class="font-orbitron text-md font-bold text-cyan-400">Soundboard Cues</h3>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="playSound('night')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded text-cyan-300 font-semibold border border-cyan-800">🌙 Close Eyes</button>
+              <button onclick="playSound('howl')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded text-rose-300 font-semibold border border-rose-800">🐺 Wolf Howl</button>
+              <button onclick="playSound('seer')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded text-purple-300 font-semibold border border-purple-800">🔮 Seer Wake</button>
+              <button onclick="playSound('day')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded text-amber-300 font-semibold border border-amber-800">☀️ Day Bell</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: SGLRS LEADERBOARD -->
+    <section id="view-leaderboard" class="hidden space-y-6">
+      <div class="bg-sglrs-panel p-6 rounded-xl neon-border">
+        <h2 class="font-orbitron text-xl font-bold text-cyan-400 mb-2">SGLRS Player Elo Standings</h2>
+        <p class="text-xs text-gray-400 mb-6">Official seasonal rankings calculated via SGLRS competitive point metrics.</p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-gray-300">
+            <thead class="bg-slate-900/80 font-orbitron text-xs text-purple-300 uppercase">
+              <tr>
+                <th class="p-3">Rank</th>
+                <th class="p-3">Player Handle</th>
+                <th class="p-3">Elo Rating</th>
+                <th class="p-3">Win Rate</th>
+                <th class="p-3">MVP Titles</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody" class="divide-y divide-purple-900/30">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ROLE ENCYCLOPEDIA & RULES -->
+    <section id="view-compendium" class="hidden space-y-6">
+      <div class="bg-sglrs-panel p-6 rounded-xl neon-border space-y-4">
+        <h2 class="font-orbitron text-xl font-bold text-purple-300">Role Encyclopedia & Official Guidelines</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div class="p-4 bg-slate-900/80 rounded-lg border border-rose-900/50 space-y-2">
+            <h3 class="font-orbitron text-rose-400 font-bold">🐺 Werewolf</h3>
+            <p class="text-xs text-gray-300">Wakes up during the night phase with fellow wolves to vote and eliminate one target player.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 rounded-lg border border-cyan-900/50 space-y-2">
+            <h3 class="font-orbitron text-cyan-400 font-bold">🔮 Seer</h3>
+            <p class="text-xs text-gray-300">Investigates one player's alignment per night. Learns whether the player is Good or a Werewolf.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 rounded-lg border border-purple-900/50 space-y-2">
+            <h3 class="font-orbitron text-purple-400 font-bold">🧪 Witch</h3>
+            <p class="text-xs text-gray-300">Holds one Healing potion and one Poison potion. Can only use one potion per night phase.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 rounded-lg border border-amber-900/50 space-y-2">
+            <h3 class="font-orbitron text-amber-400 font-bold">🛡️ Guard</h3>
+            <p class="text-xs text-gray-300">Protects one player each night from Werewolf kills. Cannot protect the same target two nights in a row.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 rounded-lg border border-emerald-900/50 space-y-2">
+            <h3 class="font-orbitron text-emerald-400 font-bold">🎯 Hunter</h3>
+            <p class="text-xs text-gray-300">When eliminated by werewolf attack or day vote, can shoot and instantly eliminate any target player.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
+            <h3 class="font-orbitron text-gray-300 font-bold">👨‍🌾 Villager</h3>
+            <p class="text-xs text-gray-300">No special night abilities. Relies on logic, observation, and voting power to exile Werewolves.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-sglrs-panel border-t border-purple-900/50 py-4 text-center text-xs text-gray-500">
+    <p>© 2026 SGLRS Hub • Singapore Langrensha Association</p>
+  </footer>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // Game State
+    let players = [];
+    let presets = {
+      '12p_standard': ['Werewolf', 'Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Hunter', 'Villager', 'Villager', 'Villager', 'Villager'],
+      '12p_wolfking': ['Wolf King', 'Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Hunter', 'Villager', 'Villager', 'Villager', 'Villager'],
+      '10p_express': ['Werewolf', 'Werewolf', 'Werewolf', 'Seer', 'Witch', 'Guard', 'Villager', 'Villager', 'Villager', 'Villager']
+    };
+
+    const leaderboardData = [
+      { name: 'Alex "Wolfie" Tan', elo: 1845, winrate: '68%', mvp: 14 },
+      { name: 'Sarah Lim (SeerQueen)', elo: 1790, winrate: '64%', mvp: 11 },
+      { name: 'Marcus Chen', elo: 1720, winrate: '59%', mvp: 9 },
+      { name: 'Chloe Wong', elo: 1650, winrate: '55%', mvp: 7 },
+      { name: 'David Kumar', elo: 1580, winrate: '52%', mvp: 5 }
+    ];
+
+    // Initialize Application
+    function init() {
+      applyPreset();
+      renderLeaderboard();
+      
+      document.getElementById('witchAction').addEventListener('change', (e) => {
+        const container = document.getElementById('witchPoisonTargetContainer');
+        container.classList.toggle('hidden', e.target.value !== 'poison');
+      });
+    }
+
+    function applyPreset() {
+      const selected = document.getElementById('presetSelect').value;
+      const roleList = presets[selected] || presets['12p_standard'];
+      
+      players = roleList.map((role, idx) => ({
+        id: idx + 1,
+        name: `Seat ${idx + 1}`,
+        role: role,
+        isAlive: true,
+        isSheriff: false
+      }));
+
+      renderPlayers();
+      populateDropdowns();
+    }
+
+    function shuffleRoles() {
+      const roles = players.map(p => p.role).sort(() => Math.random() - 0.5);
+      players.forEach((p, idx) => { p.role = roles[idx]; });
+      renderPlayers();
+      alert('Roles shuffled and distributed!');
+    }
+
+    function renderPlayers() {
+      const roster = document.getElementById('playerRoster');
+      roster.innerHTML = '';
+
+      let aliveCount = 0;
+
+      players.forEach(p => {
+        if (p.isAlive) aliveCount++;
+        
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-lg border text-xs flex flex-col justify-between space-y-2 ${
+          p.isAlive ? 'bg-slate-900/90 border-purple-800' : 'bg-slate-950 opacity-40 border-slate-800'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="font-orbitron font-bold ${p.isAlive ? 'text-cyan-400' : 'text-gray-500'}">P${p.id}</span>
+            <button onclick="toggleSheriff(${p.id})" class="text-sm">${p.isSheriff ? '⭐' : '☆'}</button>
+          </div>
+          <div>
+            <div class="font-semibold text-white">${p.name}</div>
+            <div class="text-purple-400 font-mono text-[10px]">${p.role}</div>
+          </div>
+          <button onclick="toggleAlive(${p.id})" class="w-full py-1 rounded font-bold text-[10px] transition ${
+            p.isAlive ? 'bg-rose-950 text-rose-300 border border-rose-800 hover:bg-rose-900' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+          }">
+            ${p.isAlive ? 'Eliminate' : 'Revive'}
+          </button>
+        `;
+        roster.appendChild(card);
+      });
+
+      document.getElementById('aliveCount').textContent = `Alive: ${aliveCount} / ${players.length}`;
+      populateDropdowns();
+    }
+
+    function toggleAlive(id) {
+      const player = players.find(p => p.id === id);
+      if (player) player.isAlive = !player.isAlive;
+      renderPlayers();
+    }
+
+    function toggleSheriff(id) {
+      players.forEach(p => { p.isSheriff = (p.id === id) ? !p.isSheriff : false; });
+      renderPlayers();
+    }
+
+    function populateDropdowns() {
+      const selects = ['guardTarget', 'wolfTarget', 'witchPoisonTarget'];
+      selects.forEach(sId => {
+        const el = document.getElementById(sId);
+        if (!el) return;
+        const currentVal = el.value;
+        el.innerHTML = '<option value="0">None / No Target</option>';
+        players.filter(p => p.isAlive).forEach(p => {
+          el.innerHTML += `<option value="${p.id}">Seat ${p.id} (${p.name})</option>`;
+        });
+        el.value = currentVal || '0';
+      });
+    }
+
+    function resolveNight() {
+      const guardVal = parseInt(document.getElementById('guardTarget').value);
+      const wolfVal = parseInt(document.getElementById('wolfTarget').value);
+      const witchAct = document.getElementById('witchAction').value;
+      const poisonVal = parseInt(document.getElementById('witchPoisonTarget').value);
+
+      let deaths = [];
+
+      // Logic: Werewolf Kill vs Guard & Witch
+      if (wolfVal > 0) {
+        let isProtected = (guardVal === wolfVal);
+        let isHealed = (witchAct === 'heal');
+
+        if (isProtected && isHealed) {
+          // SGLRS Rule: Tong Shou (Double protection causes death)
+          deaths.push({ id: wolfVal, reason: 'Double Protection Overkill (Tong Shou)' });
+        } else if (!isProtected && !isHealed) {
+          deaths.push({ id: wolfVal, reason: 'Werewolf Attack' });
+        }
+      }
+
+      if (witchAct === 'poison' && poisonVal > 0) {
+        deaths.push({ id: poisonVal, reason: 'Witch Poison' });
+      }
+
+      // Display Result
+      const resultEl = document.getElementById('nightResult');
+      resultEl.classList.remove('hidden');
+
+      if (deaths.length === 0) {
+        resultEl.innerHTML = `<span class="text-emerald-400 font-bold">Peaceful Night!</span> No players died.`;
+      } else {
+        let html = `<span class="text-rose-400 font-bold">Night Fatalities:</span><ul class="list-disc list-inside mt-1">`;
+        deaths.forEach(d => {
+          html += `<li>Seat ${d.id} - <span class="text-gray-300">${d.reason}</span></li>`;
+        });
+        html += `</ul>`;
+        resultEl.innerHTML = html;
+      }
+    }
+
+    function resetGame() {
+      applyPreset();
+      document.getElementById('nightResult').classList.add('hidden');
+    }
+
+    // Audio Cue Synthesizer (Web Audio API)
+    function playSound(type) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (type === 'night') {
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 1);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
+        osc.start();
+        osc.stop(ctx.currentTime + 1);
+      } else if (type === 'howl') {
+        osc.frequency.setValueAtTime(200, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(500, ctx.currentTime + 0.5);
+        osc.frequency.linearRampToValueAtTime(250, ctx.currentTime + 1.2);
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+        osc.start();
+        osc.stop(ctx.currentTime + 1.2);
+      } else if (type === 'day' || type === 'seer') {
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+      }
+    }
+
+    // Tab Navigation
+    function switchTab(tab) {
+      ['moderator', 'leaderboard', 'compendium'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tab) {
+          btn.className = 'px-4 py-2 rounded-lg font-orbitron text-sm font-semibold transition bg-purple-600 text-white shadow-lg';
+        } else {
+          btn.className = 'px-4 py-2 rounded-lg font-orbitron text-sm font-semibold text-gray-400 hover:text-white transition';
+        }
+      });
+    }
+
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboardBody');
+      tbody.innerHTML = '';
+      leaderboardData.forEach((item, index) => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-900/50">
+            <td class="p-3 font-orbitron font-bold text-cyan-400">#${index + 1}</td>
+            <td class="p-3 font-semibold text-white">${item.name}</td>
+            <td class="p-3 font-mono text-purple-300">${item.elo}</td>
+            <td class="p-3 text-emerald-400 font-semibold">${item.winrate}</td>
+            <td class="p-3 text-amber-300">${item.mvp}</td>
+          </tr>
+        `;
+      });
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
